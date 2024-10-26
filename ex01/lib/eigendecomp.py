@@ -14,7 +14,7 @@ def get_matrix_from_eigdec(e: np.ndarray, V: np.ndarray) -> np.ndarray:
         The original matrix used for eigenvalue decomposition with shape (N, N)
     """
     # START TODO #################
-    raise NotImplementedError
+    return V @ np.diag(e) @ V.T
     # END TODO ###################
 
 
@@ -29,7 +29,7 @@ def get_euclidean_norm(v: np.ndarray) -> np.ndarray:
     """
     # START TODO #################
     # Do not use np.linalg.norm
-    raise NotImplementedError
+    return get_dot_product(v, v)
     # END TODO ###################
 
 
@@ -47,7 +47,7 @@ def get_dot_product(v1: np.ndarray, v2: np.ndarray) -> float:
         len(v1.shape) == len(v2.shape) == 1 and v1.shape == v2.shape
     ), f"Input vectors must be 1-dimensional and have the same shape, but have shapes {v1.shape} and {v2.shape}"
     # START TODO #################
-    raise NotImplementedError
+    return np.dot(v1, v2)
     # END TODO ###################
 
 
@@ -63,5 +63,5 @@ def get_inverse(e: np.ndarray, V: np.ndarray) -> np.ndarray:
     """
     # START TODO #################
     # Do not use np.linalg.inv
-    raise NotImplementedError
+    return V @ np.diag(1 / e) @ V.T
     # END TODO ###################
