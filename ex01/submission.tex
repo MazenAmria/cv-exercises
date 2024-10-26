@@ -1,0 +1,63 @@
+\documentclass[addpoints]{exam}
+\pagestyle{headandfoot}
+\usepackage{amsmath, amsfonts}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage[utf8]{inputenc}
+\usepackage{parskip}
+\newcommand{\semester}{WS 2024/2025}
+\runningheader{\students}{Submission}{\semester}
+\runningfooter{}{\thepage}{}
+\headrule
+\footrule
+
+% ---------- Modify team name, students (matriculation number), exercise number here ----------
+\newcommand{\student}{Mazen Amria (5974747)}
+\newcommand{\assignmentnumber}{1}
+% ---------- End Modify ----------
+
+\title{Submission for Computer Vision Exercise \assignmentnumber}
+\author{\student}
+\date{\today}
+
+\begin{document}
+    \maketitle
+
+    % ---------- Add Solution below here ----------
+
+\section{Pen and Paper task}
+\subsection{Eigendecomposition of $2 \times 2$ matrix}
+First, let's find the eigenvalues of $A$.
+\begin{align*}
+	0 &= \det\left(A - \lambda I\right)\\
+	0 &= \det\left( \begin{bmatrix} 9 & 1 \\ 8 & 7 \end{bmatrix} - \lambda I \right)\\
+	0 &= \det\left( \begin{bmatrix} 9 - \lambda & 1 \\ 8 & 7 - \lambda \end{bmatrix}\right)\\
+	0 &= \left( 9 - \lambda \right) \cdot \left( 7 - \lambda \right) - 8 \cdot 1\\
+	0 &= \lambda^2 - 16\lambda + 55\\
+	0 &= \left( \lambda - 11 \right) \cdot \left( \lambda - 5 \right)
+\end{align*}
+Hence, the eigenvalues are $\begin{bmatrix} 11 & 5 \end{bmatrix}$, now we find the corresponding eigenvectors:
+\begin{align*}
+	0 &= \left( A - \lambda_1 I \right) \cdot \mathbf{v_1}\\
+	0 &= \begin{bmatrix} -2 & 1 \\ 8 & -4 \end{bmatrix} \cdot \mathbf{v_1}
+\end{align*}
+We solve for $\mathbf{v_1}$ and get $\begin{bmatrix} \frac{2}{\sqrt{5}} & \frac{1}{\sqrt{5}} \end{bmatrix}$. Similarly for $\mathbf{v_2}$ by substituting $\lambda = 5$, we get $\begin{bmatrix} \frac{2}{\sqrt{5}} & \frac{-1}{\sqrt{5}} \end{bmatrix}$.
+\begin{align*}
+	A = \begin{bmatrix} 9 & 1 \\ 8 & 7 \end{bmatrix} &= Q \Lambda Q^{-1}\\
+		&= \begin{bmatrix} \frac{2}{\sqrt{5}} & \frac{2}{\sqrt{5}} \\ \frac{1}{\sqrt{5}} & \frac{-1}{\sqrt{5}} \end{bmatrix}
+		\begin{bmatrix} 11 & 0 \\ 0 & 5 \end{bmatrix}
+		\begin{bmatrix} \frac{\sqrt{5}}{4} & \frac{\sqrt{5}}{2} \\ \frac{\sqrt{5}}{4} & \frac{-\sqrt{5}}{2} \end{bmatrix}
+\end{align*}
+\subsection{Computing $A^{10}$ using eigendecomposition}
+\begin{align*}
+	A^{10} &= \left( Q \Lambda Q^{-1} \right)^{10} \\
+	&= \left( Q \Lambda Q^{-1} \right) \left( Q \Lambda Q^{-1} \right) ... \\
+	&= Q \Lambda^{10} Q^{-1} \\
+	&= \begin{bmatrix} \frac{2}{\sqrt{5}} & \frac{2}{\sqrt{5}} \\ \frac{1}{\sqrt{5}} & \frac{-1}{\sqrt{5}} \end{bmatrix}
+	\begin{bmatrix} 11^{10} & 0 \\ 0 & 5^{10} \end{bmatrix}
+	\begin{bmatrix} \frac{\sqrt{5}}{4} & \frac{\sqrt{5}}{2} \\ \frac{\sqrt{5}}{4} & \frac{-\sqrt{5}}{2} \end{bmatrix}
+\end{align*}
+    % ---------- End of Document ----------
+
+\end{document}
