@@ -29,7 +29,7 @@ def get_euclidean_norm(v: np.ndarray) -> np.ndarray:
     """
     # START TODO #################
     # Do not use np.linalg.norm
-    return get_dot_product(v, v)
+    return np.sqrt(get_dot_product(v, v))
     # END TODO ###################
 
 
