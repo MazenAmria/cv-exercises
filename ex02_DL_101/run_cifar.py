@@ -72,11 +72,7 @@ def main():
     if args.optimizer == "sgd":
         optimizer = optim.SGD(model.parameters(), lr=args.learning_rate)
     elif args.optimizer == "adamw":
-        # START TODO #################
-        # create AdamW optimizer (optim.AdamW) given model.parameters() and args.learning_rate
-        # optimizer = ...
-        raise NotImplementedError
-        # END TODO ###################
+        optimizer = optim.AdamW(model.parameters(), args.learning_rate)
     else:
         raise ValueError(f"Undefined optimizer: {args.optimizer}")
 
