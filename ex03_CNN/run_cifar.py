@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Simple example script."""
 
 import argparse
@@ -24,14 +25,21 @@ def get_transforms(args):
         # use torchvision.transforms.Compose to compose our custom augmentations
         # horizontal_flip, random_resize_crop, ToTensor, Normalize
         # you can play around with the parameters
-        # train_transforms=
-        raise NotImplementedError
+        train_transforms = torchvision.transforms.Compose(
+            [horizontal_flip(0.5),
+            random_resize_crop(32, (0.5, 1.0)),
+            torchvision.transforms.ToTensor(),
+            torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
         # END TODO #################
     elif args.transforms == 'torchvision':
         # START TODO #################
         # achieve the same as above with torchvision transforms
         # compare your own implementation against theirs
-        raise NotImplementedError
+        train_transforms = torchvision.transforms.Compose(
+            [torchvision.transforms.RandomHorizontalFlip(0.5),
+            torchvision.transforms.RandomResizedCrop(32, (0.5, 1.0)),
+            torchvision.transforms.ToTensor(),
+            torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
         # END TODO #################
     else:
         raise ValueError(f"Unknown transform {args.transforms}")
@@ -145,14 +153,14 @@ def main():
 
     # START TODO #################
     # initialize the SummaryWriter with a log directory in args.out_dir/logs
-    # tb_writer = 
-    raise NotImplementedError
+    tb_writer = SummaryWriter(log_dir=f"{args.out_dir}/logs",
+                              comment=f"model_e{args.num_epochs}_{args.optimizer}_"
+                              f"f{args.num_filters}_lr{args.learning_rate:.1e}")
     # END TODO #################
 
     # START TODO #################
     # get the transforms and pass them to the dataset
-    # train_transforms, val_transforms = ...
-    raise NotImplementedError
+    train_transforms, val_transforms = get_transforms(args)
     # END TODO #################
 
     # create dataloaders
@@ -221,7 +229,8 @@ def main():
                                                     args, device)
             # START TODO ###################
             # add_scalar train_loss and train_acc to tb_writer
-            raise NotImplementedError
+            tb_writer.add_scalar("loss/train", train_loss, epoch)
+            tb_writer.add_scalar("acc/train", train_acc, epoch)
             # END TODO ###################
 
         # iterate over the val set to compute the accuracy
@@ -230,7 +239,8 @@ def main():
               f"Loss {val_loss:.6f} accuracy {val_acc:.2%}")
         # START TODO #################
         # add_scalar val_loss and val_acc to tb_writer
-        raise NotImplementedError
+        tb_writer.add_scalar("loss/val", val_loss, epoch)
+        tb_writer.add_scalar("acc/val", val_acc, epoch)
         # END TODO ###################
         print(f"---------- End of epoch {epoch + 1}")
 
@@ -247,7 +257,8 @@ def main():
     # START TODO #################
     # add_scalar test_loss and test_acc to tb_writer
     # ideally, you'd remember the model with the best validation performance and test on that
-    raise NotImplementedError
+    tb_writer.add_scalar("loss/test", test_loss)
+    tb_writer.add_scalar("acc/test", test_acc)
     # END TODO ###################
 
 
@@ -258,13 +269,11 @@ if __name__ == '__main__':
     # train the network for 256 epochs
     # use the flag --transforms basic, and specify out_dir as 'no_augment'
     # --- do not put code here ---
-    raise NotImplementedError
     # END TODO ###################
 
     # START TODO ###################
     # train the network a second time with the flag --transforms own and the out_dir 'augment'
     # --- do not put code here ---
-    raise NotImplementedError
     # END TODO ###################
 
     # START TODO ###################
@@ -283,5 +292,4 @@ if __name__ == '__main__':
     # (3) compare the training and validation curves of 'no_augment' and 'augment'
     #   see also the test performance
     # --- do not put code here ---
-    raise NotImplementedError
     # END TODO ###################
