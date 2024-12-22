@@ -21,7 +21,8 @@ def aepe(gt, pred, weight=None):
     """
     # START TODO #################
     # Hint: Check torch.linalg.norm() to compute the norm of a vector.
-    raise NotImplementedError
+    epe = pointwise_epe(gt, pred, weight=weight)
+    aepe_out = epe.mean()
     # END TODO ###################
     return aepe_out
 
@@ -43,7 +44,10 @@ def pointwise_epe(gt, pred, weight=None):
         the prediction, with shape (N,1,H,W).
     """
     # START TODO #################
-    raise NotImplementedError
+    pointwise_epe_out = torch.linalg.norm(pred - gt, dim=1, keepdim=True)
+    if weight is not None:
+        pointwise_epe_out *= weight
+    return pointwise_epe_out
     # END TODO ###################
 
 
