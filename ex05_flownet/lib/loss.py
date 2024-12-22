@@ -215,7 +215,21 @@ def photometric_loss(image_1, image_2, pred_flow, weight=None, alpha=0.5, eps=1e
     # Weight per-pixel error with the given weight if it is not None.
     # 4. Average the photometric error over all pixels where the warping was valid
     # (using the obtained warping mask).
-    raise NotImplementedError
+    pred_flow = F.interpolate(pred_flow, image_1.shape[-2:], mode="bilinear", align_corners=False)
+    image_2_warped, warping_mask = warp(image_2, offset=pred_flow)
+    
+    photo_error = torch.abs(image_1 - image_2_warped)
+    pointwise_photo_loss = (
+        charbonnier_loss(photo_error, alpha=alpha, eps=eps) * warping_mask
+    )
+    if weight is not None:
+        pointwise_photo_loss = pointwise_photo_loss * weight
+    
+    warping_mask = warping_mask.float()
+    num_valid = torch.sum(warping_mask)
+    photo_loss = 1 / (num_valid + eps) * torch.sum(pointwise_photo_loss)
+
+    return image_2_warped, warping_mask, pointwise_photo_loss, photo_loss
     # END TODO ###################
 
 
@@ -242,5 +256,24 @@ def smoothness_loss(pred_flow, weight=None, alpha=0.3, eps=1e-3):
     # mask returned by "shift_multi".
     # Weight per-pixel loss with the given weight if it is not None
     # 3. Average the smoothness loss over all pixels where the neighbours were valid.
-    raise NotImplementedError
+    offsets = torch.tensor([[1, 0], [0, 1]])
+    shifteds, shift_masks = shift_multi(pred_flow, offsets)
+    smoothness_errors = pred_flow.unsqueeze(1) - shifteds
+    
+    pointwise_smoothness_loss = torch.sum(
+        torch.sum(charbonnier_loss(smoothness_errors, alpha=alpha, eps=eps), dim=2),
+        dim=1,
+        keepdim=True,
+    )
+    mask = torch.sum(shift_masks, dim=1, keepdim=True) == len(offsets)
+    pointwise_smoothness_loss = pointwise_smoothness_loss * mask
+    if weight is not None:
+        pointwise_smoothness_loss = pointwise_smoothness_loss * weight
+
+    mask = mask.float()
+    num_valid = torch.sum(mask)
+    smoothness_loss_out = 1 / (num_valid + eps) * torch.sum(pointwise_smoothness_loss)
+    smoothness_loss_out = smoothness_loss_out * float((num_valid != 0))
+
+    return pointwise_smoothness_loss, smoothness_loss_out
     # END TODO ###################
