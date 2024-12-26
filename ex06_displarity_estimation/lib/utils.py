@@ -564,7 +564,12 @@ def project_to_image(X_ref, K, to_ref_transform, return_hom=False):
     # 3. Compute the homogeneous image coordinates x_hom by taking the dot product between P and X_ref_hom.
     # 4. Compute x_hom by dividing x_hom[0] / x_hom[2] and x_hom[1] / x_hom[2].
     # 5. Return x if return_hom is False, otherwise return x_hom.
-    raise NotImplementedError
+
+    P = np.dot(K, to_ref_transform[:3, :])
+    X_ref_hom = np.append(X_ref, 1)
+    x_hom = np.dot(P, X_ref_hom)
+
+    return x_hom if return_hom else np.array([x_hom[0] / x_hom[2], x_hom[1] / x_hom[2]])
     # END TODO ###################
 
 
@@ -590,7 +595,10 @@ def get_epipole(K, to_ref_transform, return_hom=False):
     # START TODO #################
     # Outline: construct a point (0, 0, 0) and use the function project_to_image to project it
     # to the current image (pass the hom argument to return_hom of project_to_image).
-    raise NotImplementedError
+    X_ref = np.array([0, 0, 0])
+    return project_to_image(
+        X_ref=X_ref, K=K, to_ref_transform=to_ref_transform, return_hom=return_hom
+    )
     # END TODO ###################
 
 
@@ -616,7 +624,11 @@ def compute_essential_matrix(to_ref_transform):
     # 1. Compute t, R, tx using the functions trans_from_transform, rot_from_transform,
     # cross_mat_from_vec from above.
     # 2. Compute E_ref_to_cur as dot product from tx and R.
-    raise NotImplementedError
+    t = trans_from_transform(to_ref_transform)
+    R = rot_from_transform(to_ref_transform)
+    tx = cross_mat_from_vec(t)
+
+    return np.dot(tx, R)
     # END TODO ###################
 
 
@@ -645,7 +657,17 @@ def compute_fundamental_matrix(K, to_ref_transform):
     # 3. Compute P_ref from K and an identity transform.
     # 4. Invert P_ref using np.linalg.pinv
     # 5. Compute F as dot product from epi_from_ref_in_cur_x, P_cur and P_ref_inv.
-    raise NotImplementedError
+    epi_from_ref_in_cur = get_epipole(
+        K=K, to_ref_transform=to_ref_transform, return_hom=True
+    )
+    epi_from_ref_in_cur_x = cross_mat_from_vec(epi_from_ref_in_cur)
+
+    P_cur = np.dot(K, to_ref_transform[:3, :])
+    P_ref = np.dot(K, identity_transform()[:3, :])
+
+    P_ref_inv = np.linalg.pinv(P_ref)
+
+    return epi_from_ref_in_cur_x.dot(P_cur).dot(P_ref_inv)
     # END TODO ###################
 
 
@@ -697,7 +719,11 @@ def rectify_images(image_l, image_r, K, r_to_l_transform):
     # (use functions rot_from_transform, angle_axis_from_rot, etc. from above).
     # Then create a rotation matrix that rotates both cameras around the axis for +/- angle/2.
     # START TODO ###################
-    raise NotImplementedError
+    l_to_r_transform = invert_transform(r_to_l_transform)
+    l_to_r_rotation = rot_from_transform(l_to_r_transform)
+    l_to_r_angle, axis = angle_axis_from_rot(l_to_r_rotation)
+    r_r = rot_from_angle_axis(l_to_r_angle / 2, axis)
+    r_l = rot_from_angle_axis(-l_to_r_angle / 2, axis)
     # END TODO ###################
 
     # 2. Rotate cameras (in 3d) such that epipole goes to infinity:
@@ -705,7 +731,10 @@ def rectify_images(image_l, image_r, K, r_to_l_transform):
     # between the cameras is transformed to a vector of the form (translation_norm, 0, 0).
     # The construction of R_rect is described in the book mentioned above.
     # START TODO ###################
-    raise NotImplementedError
+    T = trans_from_transform(l_to_r_transform)
+    e1 = T / np.linalg.norm(T)
+    e2 = np.array([-T[1], T[0], 0]) / np.sqrt(T[0] ** 2 + T[1] ** 2)
+    e3 = np.cross(e1, e2)
     # END TODO ###################
     R_rect = np.stack([e1, e2, e3])
 
@@ -714,7 +743,8 @@ def rectify_images(image_l, image_r, K, r_to_l_transform):
     # R_l = R_rect (matmul) r_l
     # R_r = R_rect (matmul) r_r
     # START TODO ###################
-    raise NotImplementedError
+    R_l = np.dot(R_rect, r_l)
+    R_r = np.dot(R_rect, r_r)
     # END TODO ###################
 
     # A rotation R in 3d leads to a homography H = K*R*K^-1 which can be
@@ -722,7 +752,8 @@ def rectify_images(image_l, image_r, K, r_to_l_transform):
     # 4. Compute the homographies H_l and H_r for the left and right images:
     # You can use np.linalg.inv() to invert K.
     # START TODO ###################
-    raise NotImplementedError
+    H_l = K.dot(R_l).dot(np.linalg.inv(K))
+    H_r = K.dot(R_r).dot(np.linalg.inv(K))
     # END TODO ###################
 
     # 5. Compute the transformation rrect_to_lrect_transform between the rectified cameras:
