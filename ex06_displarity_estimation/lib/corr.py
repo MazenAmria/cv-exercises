@@ -95,7 +95,9 @@ class DispSamplingPoints:
         # Implement the sampling points accordingly. Store them in the attribute self.offsets.
         # The final shape of self.offsets should be (steps+1, 2).
         # Hint: The offsets in x direction can be computed similarly as in the FlowSamplingPoints.
-        raise NotImplementedError
+        offsets_x = (torch.linspace(-steps, 0, steps + 1, dtype=torch.int32) * step_size)
+        offsets_y = torch.zeros_like(offsets_x)
+        self.offsets = torch.stack((offsets_x, offsets_y), 1)
         # END TODO ###################
 
     def __len__(self):
